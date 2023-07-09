@@ -1,0 +1,83 @@
+import base64
+import hashlib
+import pyaes, pbkdf2, binascii, os, secrets
+import rsa
+
+message = input("Merhaba, şifrelenmesini istediğiniz mesajı giriniz:")
+print("Base16, Base32, Base64, Text to Hexadecimal, Sha256, MD5, AES, RSA algoritmalarından birini seçebilirsiniz.")
+fonk = input("Yukarıdaki algoritmalardan kullanmak istediğinizi giriniz:  ")
+
+
+
+# BASE32-------------------------------------------------------------------
+def fonk_base32():
+    print("Base32 ile şifrelenmiş mesaj : ", base64.b32encode(bytearray(message, 'ascii')).decode('utf-8'))
+
+
+# BASE16-------------------------------------------------------------------
+def fonk_base16():
+    print("Base16 ile şifrelenmiş mesaj : ", base64.b16encode(bytearray(message, 'ascii')).decode('utf-8'))
+
+
+# TEXT TO HEX----------------------------------------------------------------
+def fonk_texttohex():
+    s = message.encode('utf-8')
+    print("UTF-8 ile Text to Hex Karşılığı: ", s.hex())
+
+
+# BASE64---------------------------------------------------------------------
+def fonk_base64():
+    print("Base64 ile şifrelenmiş mesaj : ", base64.b64encode(bytearray(message, 'ascii')).decode('utf-8'))
+
+
+# SHA256---------------------------------------------------------------------
+def fonk_sha256():
+    hashed_string = hashlib.sha256(message.encode('utf-8')).hexdigest()
+    print("SHA256 ile hashlenmiş mesaj: ", hashed_string)
+
+
+# MD5------------------------------------------------------------------------------
+def fonk_md5():
+    result = hashlib.md5(message.encode())
+    print("MD5 ile hashlenmiş mesaj: ", end="")
+    print(result.hexdigest())
+
+
+# RSA---------------------------------------------------------------------------------
+def fonk_rsa():
+    publicKey, privateKey = rsa.newkeys(512)
+    encMessage = rsa.encrypt(message.encode(), publicKey)
+    print("RSA ile Şifrelenmiş mesaj: ", encMessage)
+
+
+
+
+# AES-------------------------------------------------------------------
+def fonk_aes():
+    password = input("AES şifreleme için anahtarı giriniz: ")
+    passwordSalt = os.urandom(16)
+    key = pbkdf2.PBKDF2(password, passwordSalt).read(32)
+    iv = secrets.randbits(256)
+    aes = pyaes.AESModeOfOperationCTR(key, pyaes.Counter(iv))
+    ciphertext = aes.encrypt(message)
+    print('AES ile şifrelenmiş mesaj:', binascii.hexlify(ciphertext), )
+
+
+if fonk == ("Base16"):
+    fonk_base16()
+elif fonk == ("Base32"):
+    fonk_base32()
+elif fonk == ("Base64"):
+    fonk_base64()
+elif fonk == ("Text to Hexadecimal"):
+    fonk_texttohex()
+elif fonk == "Sha256":
+    fonk_sha256()
+elif fonk == "MD5":
+    fonk_md5()
+elif fonk == ("AES"):
+    fonk_aes()
+elif fonk == ("RSA"):
+    fonk_rsa()
+else:
+   print("Algoritma seçimi doğru yapılmadı.")
